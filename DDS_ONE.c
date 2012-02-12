@@ -305,9 +305,11 @@ int main(void)
 			seconds_since_startup++;
 			if(seconds_since_last_button_press == SECONDS_TO_EEPROM_SAVE)
 			{
+				// one last increment so we wont get here twice
+				seconds_since_last_button_press++;
 				save_parameters_to_eeprom();
 			}
-			else
+			else if(seconds_since_last_button_press < SECONDS_TO_EEPROM_SAVE)
 				seconds_since_last_button_press++;
 		}
 	}
