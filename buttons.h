@@ -34,7 +34,7 @@
 
 #define REPEAT_MASK (1<<BT_UP | 1<<BT_DOWN)
 #define REPEAT_START 50 // 500ms
-#define REPEAT_NEXT 20 // 200ms
+#define REPEAT_NEXT 40 // 200ms
 
 void buttons_init(void);
 void buttons_every_10_ms(void);
