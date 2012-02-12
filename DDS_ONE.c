@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012 Bjoern Biesenbach <bjoern at bjoern-b.de>
- *               2012 Norrin
+ *               2012 homerj00			<homerj00@web.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,6 +17,11 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
+#ifndef F_CPU
+#define F_CPU 16000000
+#endif
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
