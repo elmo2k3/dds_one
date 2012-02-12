@@ -104,7 +104,7 @@ void page_single_tone_draw(struct menuitem *self, uint8_t blink_f, uint8_t blink
 		strcat(s,numstring);
 		strcat(s,"kHz");
 	}
-	else if(mhz < 100) // 1-100MHz
+	else //if(mhz < 100) // 1-100MHz
 	{
 
 		ultoa(mhz,numstring,10);
@@ -125,9 +125,12 @@ void page_single_tone_draw(struct menuitem *self, uint8_t blink_f, uint8_t blink
 		ultoa(khz,numstring,10);
 		num_length += strlen(numstring);
 		strcat(s,numstring);
-		strcat(s,"MHz");
+		if(mhz > 100)
+			strcat(s,"M  ");
+		else
+			strcat(s,"MHz");
 	}
-	else // >100MHz
+/*	else // >100MHz
 	{
 
 		ultoa(mhz,numstring,10);
@@ -136,7 +139,7 @@ void page_single_tone_draw(struct menuitem *self, uint8_t blink_f, uint8_t blink
 		strcat(s,".");
 		num_length++;
 		khz = khz/10; // dont draw single khz any more now
-		if(khz < 100) // add leading zeroes
+		if(khz < 10) // add leading zeroes
 		{
 			strcat(s,"0");
 			num_length++;
@@ -145,7 +148,7 @@ void page_single_tone_draw(struct menuitem *self, uint8_t blink_f, uint8_t blink
 		num_length += strlen(numstring);
 		strcat(s,numstring);
 		strcat(s,"MHz");
-	}
+	}*/
 	// fill with whitespaces
 	for(i=0;i<7-num_length;i++)
 	{
@@ -170,18 +173,35 @@ void page_single_tone_bt_f(struct menuitem *self, uint8_t button, uint8_t rpt)
 	else
 		num_rpt = 0;
 
-	if(num_rpt > 20)
+	if(num_rpt > 40)
 	{
-		num_rpt = 20;
+		num_rpt = 40;
+		increment = 10000000; // 10MHz
+	}
+	else if(num_rpt > 30)
+	{
 		increment = 1000000; // 1MHz
 	}
-	else if(num_rpt > 10)
+	else if(num_rpt > 20)
+	{
 		increment = 100000; // 100kHz
+	}
+	else if(num_rpt > 10)
+		increment = 10000; // 10kHz
 	else
 		increment = 1000; // 1kHz
 
+	// clear everything below increment step
+	// example: f=101.111MHz
+	// increment step 1MHz
+	// next value: f= 102.000MHz
+	frequency = frequency/increment;
+	frequency = frequency*increment;
+
 	if(button == BT_UP)
+	{
 		frequency += increment;
+	}
 	else if(button == BT_DOWN)
 		frequency -= increment;
 
