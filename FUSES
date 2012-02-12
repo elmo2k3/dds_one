@@ -1,0 +1,1 @@
+avrdude -c dragon_jtag -P usb -p m128 -v -U lfuse:w:0x1e:m -U hfuse:w:0x17:m

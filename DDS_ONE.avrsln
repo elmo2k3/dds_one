@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# AvrStudio Solution File, Format Version 11.00
+Project("{D1100916-62DA-4D80-A9B4-55A1E7CCEEB3}") = "DDS_ONE", "DDS_ONE.avrgccproj", "{A669D2FC-8BF4-4946-ADCF-45759598E08D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A669D2FC-8BF4-4946-ADCF-45759598E08D}.Debug|AVR.ActiveCfg = Debug|AVR
+		{A669D2FC-8BF4-4946-ADCF-45759598E08D}.Debug|AVR.Build.0 = Debug|AVR
+		{A669D2FC-8BF4-4946-ADCF-45759598E08D}.Release|AVR.ActiveCfg = Release|AVR
+		{A669D2FC-8BF4-4946-ADCF-45759598E08D}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
