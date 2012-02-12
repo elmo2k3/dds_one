@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012 Bjoern Biesenbach <bjoern at bjoern-b.de>
- *               2012 Norrin
+ *               2012 homerj00			<homerj00@web.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,9 +28,9 @@
 #define BT_PIN  PIND
 #define BT_DDR  DDRD
 
-#define BT_UP    5
-#define BT_DOWN   6
-#define BT_CM    7
+#define BT_UP    PD5
+#define BT_DOWN   PD6
+#define BT_CM    PD7
 
 #define REPEAT_MASK (1<<BT_UP | 1<<BT_DOWN)
 #define REPEAT_START 50 // 500ms

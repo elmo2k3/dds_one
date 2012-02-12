@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012 Bjoern Biesenbach <bjoern at bjoern-b.de>
- *               2012 Norrin
+ *               2012 homerj00			<homerj00@web.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -25,29 +25,29 @@
 //Variable Gain Amplifier Pins
 #define VGA_DDR DDRG
 #define VGA_PORT PORTG
-#define VGA_G0 0
-#define VGA_G1 1
-#define VGA_G2 2
-#define VGA_G3 3
+#define VGA_G0 PG0
+#define VGA_G1 PG1
+#define VGA_G2 PG2
+#define VGA_G3 PG3
 
 //DDS Pins
 #define DDS_DDR DDRA
 #define DDS_PORT PORTA
-#define DDS_PS0 0
-#define DDS_PS1 1
-#define DDS_IOUPDATE 2
-#define DDS_CLKMODESEL 3
-#define DDS_IOSYNC 4
-#define DDS_RESET 5
-#define DDS_PWRDWNCTL 6
+#define DDS_PS0 PA0
+#define DDS_PS1 PA1
+#define DDS_IOUPDATE PA2
+#define DDS_CLKMODESEL PA3
+#define DDS_IOSYNC PA4
+#define DDS_RESET PA5
+#define DDS_PWRDWNCTL PA6
 
 //DDS SPI Pins
 #define SPI_DDR DDRB
 #define SPI_PORT PORTB
-#define DDS_CS 4
-#define SPI_MOSI 2
-#define SPI_MISO 3
-#define SPI_SCK 1
+#define DDS_CS PB4
+#define SPI_MOSI PB2
+#define SPI_MISO PB3
+#define SPI_SCK PB1
 
 #define DDS_REGISTER_CFR1 0x00
 #define DDS_REGISTER_CFR1_LENGTH 4

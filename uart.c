@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Norrin
+ * Copyright (C) 2012 homerj00	<homerj00@web.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
