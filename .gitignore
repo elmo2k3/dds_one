@@ -27,3 +27,12 @@ missing
 mkinstalldirs
 stamp-h1
 .deps
+*.avrsuo
+*.d
+*.eep
+*.map
+*.sym
+*.lst
+*.hex
+*.elf
+*.lss
