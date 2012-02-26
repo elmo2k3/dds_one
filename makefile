@@ -39,7 +39,7 @@ TARGET = DDS_ONE
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c adc.c DDS.c fifo.c lcd-routines.c uart.c buttons.c
+SRC = $(TARGET).c adc.c DDS.c fifo.c lcd-routines.c uart.c buttons.c page_single_tone.c
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s

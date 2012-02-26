@@ -30,11 +30,13 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "DDS_ONE.h"
 #include "uart.h"
 #include "adc.h"
 #include "DDS.h"
 #include "buttons.h"
 #include "lcd-routines.h"
+#include "page_single_tone.h"
 #include "version.h"
 
 #define FLAG_500MS 1
@@ -45,18 +47,11 @@
 uint32_t frequency_eeprom EEMEM;
 uint8_t gain_eeprom EEMEM;
 
+// frequency and gain are global to all files!
 uint32_t frequency; // frequency in single tone mode
 uint8_t gain; // gain
-volatile uint8_t refreshFlags;
 
-struct menuitem
-{
-    char line1[30];
-	char line2[30];
-    void (*draw_func)(struct menuitem *self, uint8_t opt1, uint8_t opt2);
-    void (*button_func)(struct menuitem *self, uint8_t button, uint8_t rpt);
-    void (*periodic_500ms_func)(struct menuitem *self);
-};
+volatile uint8_t refreshFlags;
 
 void init(void);
 void wait(uint8_t k);
@@ -64,188 +59,13 @@ void timer_init(void);
 
 void save_parameters_to_eeprom(void);
 
-void page_single_tone_draw(struct menuitem *self, uint8_t blink_f, uint8_t blink_g);
-void page_single_tone_bt_f(struct menuitem *self, uint8_t button, uint8_t rpt);
-void page_single_tone_bt_g(struct menuitem *self, uint8_t button, uint8_t rpt);
-void page_single_tone_blink_f(struct menuitem *self);
-void page_single_tone_blink_g(struct menuitem *self);
-void page_single_tone_periodic(struct menuitem *self);
-
-//#define NUM_PAGES 3
+// Line 1 , Line 2 , draw func , button func , periodic 500ms func
 struct menuitem menu [] = {
 	{"  Single  Tone  ", "", page_single_tone_draw, NULL, NULL},
 	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_f, page_single_tone_blink_f},
 	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_g, page_single_tone_blink_g}
 };
 static const unsigned NUM_PAGES = sizeof(menu) / sizeof(menu[0]);
-
-/* Menu
- * 		1234567890123456
- * 	1	  Single  Tone
- * 	2	f=100.0MHz  v=15
-*/
-void page_single_tone_draw(struct menuitem *self, uint8_t blink_f, uint8_t blink_g)
-{
-	char numstring[10];
-	char s[20];
-	uint8_t i;
-	uint8_t num_length = 0;
-	uint32_t mhz;
-	uint32_t khz;
-	
-	mhz = frequency/1000000;
-	khz = (frequency - mhz*1000000)/1000;
-
-	lcd_clear();
-	lcd_string(self->line1);
-	lcd_setcursor(0,2); // next line
-
-	if(blink_f)
-		strcpy(s," =");
-	else
-		strcpy(s,"f=");
-	if(mhz == 0) // draw khz only
-	{
-		ultoa(frequency/1000,numstring,10);
-		num_length = strlen(numstring);
-		strcat(s,numstring);
-		strcat(s,"kHz");
-	}
-	else //if(mhz < 100) // 1-100MHz
-	{
-
-		ultoa(mhz,numstring,10);
-		num_length = strlen(numstring);
-		strcat(s,numstring);
-		strcat(s,".");
-		num_length++;
-		if(khz < 100) // add leading zeroes
-		{
-			strcat(s,"0");
-			num_length++;
-		}
-		if(khz < 10)
-		{
-			strcat(s,"0");
-			num_length++;
-		}
-		ultoa(khz,numstring,10);
-		num_length += strlen(numstring);
-		strcat(s,numstring);
-		if(mhz > 100)
-			strcat(s,"M  ");
-		else
-			strcat(s,"MHz");
-	}
-/*	else // >100MHz
-	{
-
-		ultoa(mhz,numstring,10);
-		num_length = strlen(numstring);
-		strcat(s,numstring);
-		strcat(s,".");
-		num_length++;
-		khz = khz/10; // dont draw single khz any more now
-		if(khz < 10) // add leading zeroes
-		{
-			strcat(s,"0");
-			num_length++;
-		}
-		ultoa(khz,numstring,10);
-		num_length += strlen(numstring);
-		strcat(s,numstring);
-		strcat(s,"MHz");
-	}*/
-	// fill with whitespaces
-	for(i=0;i<7-num_length;i++)
-	{
-		strcat(s," ");
-	}
-	if(blink_g)
-		strcat(s," =");
-	else
-		strcat(s,"v=");
-	ultoa(gain,numstring,10);
-	strcat(s,numstring);
-	lcd_string(s);
-}
-
-void page_single_tone_bt_f(struct menuitem *self, uint8_t button, uint8_t rpt)
-{
-	static uint8_t num_rpt = 0;
-	uint32_t increment;
-	
-	if(rpt)
-		num_rpt++;
-	else
-		num_rpt = 0;
-
-	if(num_rpt > 40)
-	{
-		num_rpt = 40;
-		increment = 10000000; // 10MHz
-	}
-	else if(num_rpt > 30)
-	{
-		increment = 1000000; // 1MHz
-	}
-	else if(num_rpt > 20)
-	{
-		increment = 100000; // 100kHz
-	}
-	else if(num_rpt > 10)
-		increment = 10000; // 10kHz
-	else
-		increment = 1000; // 1kHz
-
-	// clear everything below increment step
-	// example: f=101.111MHz
-	// increment step 1MHz
-	// next value: f= 102.000MHz
-	frequency = frequency/increment;
-	frequency = frequency*increment;
-
-	if(button == BT_UP)
-	{
-		frequency += increment;
-	}
-	else if(button == BT_DOWN)
-		frequency -= increment;
-
-	if(frequency > 200000000)
-		frequency = 0;
-
-	dds_set_frequency(frequency);
-	self->draw_func(self,0,0);
-}
-void page_single_tone_bt_g(struct menuitem *self, uint8_t button, uint8_t rpt)
-{
-	if(button == BT_UP)
-	{
-		if(++gain > 0x0F)
-			gain = 0;
-	}
-	else if(button == BT_DOWN)
-	{
-		if(--gain > 0x0F) // because of unsigned
-			gain = 0x0F;
-	}
-	dds_vga_set_gain(gain);
-	self->draw_func(self,0,0);
-}
-
-void page_single_tone_blink_f(struct menuitem *self)
-{
-	static uint8_t blink_f;
-	blink_f ^= 1;
-	self->draw_func(self,blink_f,0);
-}
-void page_single_tone_blink_g(struct menuitem *self)
-{
-	static uint8_t blink_g;
-	blink_g ^= 1;
-	self->draw_func(self,0,blink_g);
-}
 
 int main(void)
 {
