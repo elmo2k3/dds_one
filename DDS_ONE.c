@@ -35,6 +35,7 @@
 #include "DDS.h"
 #include "buttons.h"
 #include "lcd-routines.h"
+#include "version.h"
 
 #define FLAG_500MS 1
 #define FLAG_1S 2
@@ -70,12 +71,13 @@ void page_single_tone_blink_f(struct menuitem *self);
 void page_single_tone_blink_g(struct menuitem *self);
 void page_single_tone_periodic(struct menuitem *self);
 
-#define NUM_PAGES 3
+//#define NUM_PAGES 3
 struct menuitem menu [] = {
 	{"  Single  Tone  ", "", page_single_tone_draw, NULL, NULL},
 	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_f, page_single_tone_blink_f},
 	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_g, page_single_tone_blink_g}
 };
+static const unsigned NUM_PAGES = sizeof(menu) / sizeof(menu[0]);
 
 /* Menu
  * 		1234567890123456
@@ -344,18 +346,8 @@ void init(void)
 	//lcd_toggle_backlight();
 	lcd_string("    DDS ONE");
 	lcd_setcursor( 0, 2 );
-	lcd_string("      v1.0");
-//	wait(15);
-	lcd_clear();
-	lcd_setcursor( 0, 1 );
-	lcd_string("Initialisierung");
-	lcd_setcursor( 0, 2 );
-	lcd_string("  erfolgreich!");
-	//lcd_toggle_backlight();
-//	wait(5);
-	//lcd_toggle_backlight();
-//	wait(5);
-	//lcd_toggle_backlight();
+	lcd_string(GIT_VERSION);
+	wait(10);
 	
 	frequency = eeprom_read_dword(&frequency_eeprom);
 	if(frequency == 0xFFFFFFFF) // cell after erase cycle
