@@ -29,7 +29,8 @@
 
 #define FREQUENCY_FACTOR 10.73741824
 
-static void dds_cmd(uint8_t address, uint8_t read_access, uint32_t value, uint8_t size);
+static void dds_cmd(uint8_t address, uint8_t read_access, uint8_t *value, uint8_t size);
+static void dds_cmd_32(uint8_t address, uint8_t read_access, uint32_t value, uint8_t size);
 
 void dds_init(void)
 {
@@ -54,10 +55,10 @@ void dds_init(void)
 	DDS_DO_RESET();
 
 	// set AutoClr Phase Accum
-	dds_cmd(DDS_REGISTER_CFR1, 0, 0x00000200, DDS_REGISTER_CFR1_LENGTH);
+	dds_cmd_32(DDS_REGISTER_CFR1, 0, 0x00000200, DDS_REGISTER_CFR1_LENGTH);
 	// set REFCLK Multiplier to 16 and activate high frequency VCO range
 	// running at 400MHz now
-	dds_cmd(DDS_REGISTER_CFR2, 0, 0x00000084, DDS_REGISTER_CFR2_LENGTH);
+	dds_cmd_32(DDS_REGISTER_CFR2, 0, 0x00000084, DDS_REGISTER_CFR2_LENGTH);
 }
 
 void dds_vga_set_gain(uint8_t gain)
@@ -68,11 +69,27 @@ void dds_vga_set_gain(uint8_t gain)
 
 void dds_set_frequency(uint32_t frequency)
 {
-	dds_cmd(DDS_REGISTER_FTW0,0, FREQUENCY_FACTOR*frequency, DDS_REGISTER_FTW0_LENGTH);
+	dds_cmd_32(DDS_REGISTER_FTW0,0, FREQUENCY_FACTOR*frequency, DDS_REGISTER_FTW0_LENGTH);
 	DDS_DO_IOUPDATE();
 }
 
-static void dds_cmd(uint8_t address, uint8_t read_access, uint32_t value, uint8_t size)
+static void dds_cmd_32(uint8_t address, uint8_t read_access, uint32_t value, uint8_t size)
+{
+	uint8_t i;
+	uint8_t values[4];
+
+	if(size>4) return;
+
+	for(i=0;i<size;i++)
+	{
+		values[size-i-1] = (value>>((size-i-1)*8))&0xFF;
+	}
+
+	dds_cmd(address,read_access,values,size);
+}
+
+
+static void dds_cmd(uint8_t address, uint8_t read_access, uint8_t *values, uint8_t size)
 {
 	uint8_t i;
 	uint32_t temp;
@@ -86,7 +103,7 @@ static void dds_cmd(uint8_t address, uint8_t read_access, uint32_t value, uint8_
 	for(i=0;i<size;i++)
 	{
 		// Start with upper byte (MSB first)
-		temp = (value>>((size-i-1)*8));
+		temp = values[size-i-1];
 		SPDR = temp & 0xFF;
     	while(!(SPSR & (1<<SPIF))); // wait until transmission finished
 	}
