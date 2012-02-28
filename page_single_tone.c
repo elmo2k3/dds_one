@@ -144,7 +144,7 @@ void page_single_tone_bt_f(struct menuitem *self, uint8_t button, uint8_t rpt)
 	if(frequency > 200000000)
 		frequency = 0;
 
-	dds_set_frequency(frequency);
+	dds_set_single_tone_frequency(frequency);
 	self->draw_func(self,0,0);
 }
 void page_single_tone_bt_g(struct menuitem *self, uint8_t button, uint8_t rpt)

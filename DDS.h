@@ -57,9 +57,14 @@
 #define DDS_REGISTER_FTW0_LENGTH 4
 #define DDS_REGISTER_FTW1 0x06
 #define DDS_REGISTER_FTW1_LENGTH 4
+#define DDS_REGISTER_NLSCW 0x07
+#define DDS_REGISTER_NLSCW_LENGTH 5
+#define DDS_REGISTER_PLSCW 0x08
+#define DDS_REGISTER_PLSCW_LENGTH 5
 
 void dds_init(void);
-void dds_set_frequency(uint32_t frequency);
+void dds_set_single_tone_frequency(uint32_t frequency);
+void dds_set_linear_sweep(uint32_t f_start, uint32_t f_stop, uint32_t step_up, uint32_t step_down);
 void dds_vga_set_gain(uint8_t gain);
 
 #endif /* DDS_H_ */

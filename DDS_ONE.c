@@ -37,6 +37,7 @@
 #include "buttons.h"
 #include "lcd-routines.h"
 #include "page_single_tone.h"
+#include "page_linear_sweep.h"
 #include "version.h"
 
 #define FLAG_500MS 1
@@ -63,7 +64,8 @@ void save_parameters_to_eeprom(void);
 struct menuitem menu [] = {
 	{"  Single  Tone  ", "", page_single_tone_draw, NULL, NULL},
 	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_f, page_single_tone_blink_f},
-	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_g, page_single_tone_blink_g}
+	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_g, page_single_tone_blink_g},
+	{"  Linear Sweep  ", "", page_linear_sweep_draw, page_linear_sweep_bt_f, NULL}
 };
 static const unsigned NUM_PAGES = sizeof(menu) / sizeof(menu[0]);
 
@@ -75,7 +77,7 @@ int main(void)
 
 	init();
 	
-	dds_set_frequency(frequency);
+	dds_set_single_tone_frequency(frequency);
 	dds_vga_set_gain(gain);
 
 	seconds_since_last_button_press = SECONDS_TO_EEPROM_SAVE+1;
@@ -167,7 +169,7 @@ void init(void)
 	lcd_string("    DDS ONE");
 	lcd_setcursor( 0, 2 );
 	lcd_string(GIT_VERSION);
-	wait(10);
+	wait(20);
 	
 	frequency = eeprom_read_dword(&frequency_eeprom);
 	if(frequency == 0xFFFFFFFF) // cell after erase cycle
