@@ -182,7 +182,7 @@ void init(void)
 void timer_init()
 {
 	// timer 0
-	TCCR0 = 1<<WGM01^1<<CS01^1<<CS00;     // CTC, XTAL / 64
+	TCCR0 = (1<<WGM01)|(1<<CS02);     // CTC, XTAL / 64
     OCR0 = (uint8_t)(F_CPU / 64.0 * 1e-3 - 0.5);   // 1ms
     TIMSK |= 1<<OCIE0;
 }
