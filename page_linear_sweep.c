@@ -39,8 +39,18 @@ void page_linear_sweep_draw(struct menuitem *self, uint8_t blink_f, uint8_t blin
     dds_set_linear_sweep(1e6,200e6,1e2,1e2);
 }
 
-void page_linear_sweep_bt_f(struct menuitem *self, uint8_t button, uint8_t rpt)
+uint8_t page_linear_sweep_bt(struct menuitem *self, uint8_t button, uint8_t rpt)
 {
     PORTA ^= (1<<PA0);
+}
+
+void page_linear_sweep_periodic(struct menuitem *self)
+{
+}
+void page_linear_sweep_load_parameters(struct menuitem *self)
+{
+}
+void page_linear_sweep_write_parameters(struct menuitem *self)
+{
 }
 

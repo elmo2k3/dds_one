@@ -23,16 +23,15 @@
 #ifndef __DDS_ONE_H__
 #define __DDS_ONE_H__
 
-extern uint32_t frequency; // frequency in single tone mode
-extern uint8_t gain; // gain
-
 struct menuitem
 {
     char line1[30];
 	char line2[30];
-    void (*draw_func)(struct menuitem *self, uint8_t opt1, uint8_t opt2);
-    void (*button_func)(struct menuitem *self, uint8_t button, uint8_t rpt);
+    void (*draw_func)(struct menuitem *self);
+    uint8_t (*button_func)(struct menuitem *self, uint8_t button, uint8_t rpt);
     void (*periodic_500ms_func)(struct menuitem *self);
+    void (*parameter_load_func)();
+    void (*parameter_save_func)();
 };
 
 #endif

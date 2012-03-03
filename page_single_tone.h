@@ -23,12 +23,11 @@
 #ifndef __SINGLE_TONE_H__
 #define __SINGLE_TONE_H__
 
-void page_single_tone_draw(struct menuitem *self, uint8_t blink_f, uint8_t blink_g);
-void page_single_tone_bt_f(struct menuitem *self, uint8_t button, uint8_t rpt);
-void page_single_tone_bt_g(struct menuitem *self, uint8_t button, uint8_t rpt);
-void page_single_tone_blink_f(struct menuitem *self);
-void page_single_tone_blink_g(struct menuitem *self);
+void page_single_tone_draw(struct menuitem *self);
+uint8_t page_single_tone_bt(struct menuitem *self, uint8_t button, uint8_t rpt);
 void page_single_tone_periodic(struct menuitem *self);
+void page_single_tone_load_parameters(struct menuitem *self);
+void page_single_tone_write_parameters(struct menuitem *self);
 
 #endif
 

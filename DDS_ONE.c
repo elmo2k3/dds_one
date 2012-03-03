@@ -24,7 +24,6 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/eeprom.h>
 #include <stdlib.h>
 #include <util/delay.h>
 #include <string.h>
@@ -45,45 +44,67 @@
 
 #define SECONDS_TO_EEPROM_SAVE 10
 
-uint32_t frequency_eeprom EEMEM;
-uint8_t gain_eeprom EEMEM;
-
-// frequency and gain are global to all files!
-uint32_t frequency; // frequency in single tone mode
-uint8_t gain; // gain
-
 volatile uint8_t refreshFlags;
 
 void init(void);
 void wait(uint8_t k);
 void timer_init(void);
 
+void load_parameters_from_eeprom(void);
 void save_parameters_to_eeprom(void);
 
-// Line 1 , Line 2 , draw func , button func , periodic 500ms func
+// Line 1 , Line 2 , draw func , button func , periodic 500ms func, eeprom load, eeprom save
 struct menuitem menu [] = {
-	{"  Single  Tone  ", "", page_single_tone_draw, NULL, NULL},
-	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_f, page_single_tone_blink_f},
-	{"  Single  Tone  ", "", page_single_tone_draw, page_single_tone_bt_g, page_single_tone_blink_g},
-	{"  Linear Sweep  ", "", page_linear_sweep_draw, page_linear_sweep_bt_f, NULL}
+	{"Single Tone ", "", page_single_tone_draw, page_single_tone_bt,
+						 page_single_tone_periodic, page_single_tone_load_parameters,
+						 page_single_tone_write_parameters},
+	{"  Linear Sweep  ", "", page_linear_sweep_draw, page_linear_sweep_bt,
+						 page_linear_sweep_periodic, page_linear_sweep_load_parameters,
+						 page_linear_sweep_write_parameters}
 };
 static const unsigned NUM_PAGES = sizeof(menu) / sizeof(menu[0]);
+
+void save_parameters_to_eeprom()
+{
+	uint8_t i;
+
+	for(i=0;i<NUM_PAGES;i++)
+	{
+		if(menu[i].parameter_save_func)
+			menu[i].parameter_save_func();
+	}
+	lcd_toggle_backlight();
+	wait(1);
+	lcd_toggle_backlight();
+}
+
+void load_parameters_from_eeprom()
+{
+	uint8_t i;
+
+	for(i=0;i<NUM_PAGES;i++)
+	{
+		if(menu[i].parameter_load_func)
+			menu[i].parameter_load_func();
+	}
+}
 
 int main(void)
 {
 	uint8_t menu_position;
 	uint8_t seconds_since_last_button_press;
 	uint32_t seconds_since_startup;
+	uint8_t focus_here;
 
 	init();
 	
-	dds_set_single_tone_frequency(frequency);
-	dds_vga_set_gain(gain);
-
 	seconds_since_last_button_press = SECONDS_TO_EEPROM_SAVE+1;
 	seconds_since_startup = 0;
 	menu_position = 0;
-	menu[menu_position].draw_func(&menu[menu_position],0,0);
+	focus_here = 1;
+
+	load_parameters_from_eeprom();
+	menu[menu_position].draw_func(&menu[menu_position]);
 
     while(1)
     {
@@ -95,9 +116,19 @@ int main(void)
 		}
 		if(buttons_get_press(1<<BT_UP))
 		{
-			seconds_since_last_button_press = 0;
-			if(menu[menu_position].button_func)
-				menu[menu_position].button_func(&menu[menu_position],BT_UP,0);
+			if(focus_here)
+			{
+				menu_position++;
+				if(menu_position == NUM_PAGES)
+					menu_position = 0;
+				menu[menu_position].draw_func(&menu[menu_position]);
+			}
+			else
+			{
+				seconds_since_last_button_press = 0;
+				if(menu[menu_position].button_func)
+					menu[menu_position].button_func(&menu[menu_position],BT_UP,0);
+			}
 		}
 		if(buttons_get_rpt(1<<BT_DOWN))
 		{
@@ -107,16 +138,33 @@ int main(void)
 		}
 		if(buttons_get_press(1<<BT_DOWN))
 		{
+			if(focus_here)
+			{
+				menu_position--;
+				if(menu_position == NUM_PAGES)
+					menu_position = 0;
+				if(menu_position > NUM_PAGES)
+					menu_position = NUM_PAGES-1;
+				menu[menu_position].draw_func(&menu[menu_position]);
+			}
+			else
+			{
+				seconds_since_last_button_press = 0;
+				if(menu[menu_position].button_func)
+					menu[menu_position].button_func(&menu[menu_position],BT_DOWN,0);
+			}
+		}
+		if(buttons_get_rpt(1<<BT_CM))
+		{
 			seconds_since_last_button_press = 0;
 			if(menu[menu_position].button_func)
-				menu[menu_position].button_func(&menu[menu_position],BT_DOWN,0);
+				focus_here = menu[menu_position].button_func(&menu[menu_position],BT_CM,1);
 		}
 		if(buttons_get_press(1<<BT_CM))
 		{
-			menu_position++;
-			if(menu_position == NUM_PAGES)
-				menu_position = 0;
-			menu[menu_position].draw_func(&menu[menu_position],0,0);
+			seconds_since_last_button_press = 0;
+			if(menu[menu_position].button_func)
+				focus_here = menu[menu_position].button_func(&menu[menu_position],BT_CM,0);
 		}
 		if(refreshFlags & (1<<FLAG_500MS)){
 			refreshFlags &= ~(1<<FLAG_500MS);
@@ -137,15 +185,6 @@ int main(void)
 				seconds_since_last_button_press++;
 		}
 	}
-}
-
-void save_parameters_to_eeprom()
-{
-	eeprom_write_dword(&frequency_eeprom, frequency);
-	eeprom_write_byte(&gain_eeprom, gain);
-	lcd_toggle_backlight();
-	wait(1);
-	lcd_toggle_backlight();
 }
 
 void init(void)
@@ -169,14 +208,7 @@ void init(void)
 	lcd_string("    DDS ONE");
 	lcd_setcursor( 0, 2 );
 	lcd_string(GIT_VERSION);
-	wait(20);
-	
-	frequency = eeprom_read_dword(&frequency_eeprom);
-	if(frequency == 0xFFFFFFFF) // cell after erase cycle
-		frequency = 0;
-	gain = eeprom_read_byte(&gain_eeprom);
-	if(gain == 0xFF)
-		gain = 0;
+	wait(10);
 }
 
 void timer_init()

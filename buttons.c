@@ -91,4 +91,8 @@ uint8_t buttons_get_short( uint8_t key_mask )
       return buttons_get_press( ~key_state & key_mask );
 }
 
- 
+uint8_t buttons_get_long( uint8_t key_mask )
+{
+      return buttons_get_press( buttons_get_rpt( key_mask ));
+}
+

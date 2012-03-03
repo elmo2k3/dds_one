@@ -32,14 +32,15 @@
 #define BT_DOWN   PD6
 #define BT_CM    PD7
 
-#define REPEAT_MASK (1<<BT_UP | 1<<BT_DOWN)
+#define REPEAT_MASK (1<<BT_UP | 1<<BT_DOWN | 1<<BT_CM)
 #define REPEAT_START 50 // 500ms
-#define REPEAT_NEXT 40 // 200ms
+#define REPEAT_NEXT 10 // 200ms
 
 void buttons_init(void);
 void buttons_every_10_ms(void);
 uint8_t buttons_get_press(uint8_t key_mask);
 uint8_t buttons_get_rpt( uint8_t key_mask );
+uint8_t buttons_get_long( uint8_t key_mask );
 
 #endif
 
