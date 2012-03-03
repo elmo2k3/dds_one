@@ -64,7 +64,9 @@
 
 void dds_init(void);
 void dds_set_single_tone_frequency(uint32_t frequency);
-void dds_set_linear_sweep(uint32_t f_start, uint32_t f_stop, uint32_t step_up, uint32_t step_down);
+void dds_set_linear_sweep(uint32_t f_start, uint32_t f_stop,
+                          uint32_t step_up, uint32_t step_down,
+                          uint8_t ramp_rate);
 void dds_vga_set_gain(uint8_t gain);
 
 #endif /* DDS_H_ */

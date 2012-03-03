@@ -29,7 +29,7 @@ struct menuitem
 	char line2[30];
     void (*draw_func)(struct menuitem *self);
     uint8_t (*button_func)(struct menuitem *self, uint8_t button, uint8_t rpt);
-    void (*periodic_500ms_func)(struct menuitem *self);
+    void (*periodic_50ms_func)(struct menuitem *self);
     void (*parameter_load_func)();
     void (*parameter_save_func)();
 };

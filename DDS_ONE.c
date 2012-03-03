@@ -39,7 +39,7 @@
 #include "page_linear_sweep.h"
 #include "version.h"
 
-#define FLAG_500MS 1
+#define FLAG_50MS 1
 #define FLAG_1S 2
 
 #define SECONDS_TO_EEPROM_SAVE 10
@@ -110,7 +110,8 @@ int main(void)
     {
 		if(buttons_get_rpt(1<<BT_UP))
 		{
-			seconds_since_last_button_press = 0;
+			if(!focus_here)
+				seconds_since_last_button_press = 0;
 			if(menu[menu_position].button_func)
 				menu[menu_position].button_func(&menu[menu_position],BT_UP,1);
 		}
@@ -132,7 +133,8 @@ int main(void)
 		}
 		if(buttons_get_rpt(1<<BT_DOWN))
 		{
-			seconds_since_last_button_press = 0;
+			if(!focus_here)
+				seconds_since_last_button_press = 0;
 			if(menu[menu_position].button_func)
 				menu[menu_position].button_func(&menu[menu_position],BT_DOWN,1);
 		}
@@ -156,20 +158,18 @@ int main(void)
 		}
 		if(buttons_get_rpt(1<<BT_CM))
 		{
-			seconds_since_last_button_press = 0;
 			if(menu[menu_position].button_func)
 				focus_here = menu[menu_position].button_func(&menu[menu_position],BT_CM,1);
 		}
 		if(buttons_get_press(1<<BT_CM))
 		{
-			seconds_since_last_button_press = 0;
 			if(menu[menu_position].button_func)
 				focus_here = menu[menu_position].button_func(&menu[menu_position],BT_CM,0);
 		}
-		if(refreshFlags & (1<<FLAG_500MS)){
-			refreshFlags &= ~(1<<FLAG_500MS);
-			if(menu[menu_position].periodic_500ms_func)
-				menu[menu_position].periodic_500ms_func(&menu[menu_position]);
+		if(refreshFlags & (1<<FLAG_50MS)){
+			refreshFlags &= ~(1<<FLAG_50MS);
+			if(menu[menu_position].periodic_50ms_func)
+				menu[menu_position].periodic_50ms_func(&menu[menu_position]);
     	}
 		if(refreshFlags & (1<<FLAG_1S))
 		{
@@ -238,8 +238,8 @@ ISR(SIG_OUTPUT_COMPARE0) // 1ms
 	}else if(!(prescaler % 10)){ // 10ms
 		buttons_every_10_ms();
 	}
-	if(!(prescaler % 500)){ // 500ms
-		refreshFlags |= (1<<FLAG_500MS);
+	if(!(prescaler % 50)){ // 50ms
+		refreshFlags |= (1<<FLAG_50MS);
 	}
 	sei();
 }

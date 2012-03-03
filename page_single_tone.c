@@ -50,12 +50,7 @@ static uint8_t gain_eeprom EEMEM;
 static uint32_t frequency; // frequency in single tone mode
 static uint8_t gain; // gain
 
-
 /* Menu
- * 		1234567890123456
- * 	1	  Single  Tone
- * 	2	f=100.0MHz  v=15
- *
  * 		1234567890123456
  * 	1	Single Tone v=15
  * 	2	f=100.000000MHz
@@ -148,10 +143,7 @@ void page_single_tone_draw(struct menuitem *self)
 uint8_t page_single_tone_bt(struct menuitem *self, uint8_t button, uint8_t rpt)
 {
 	static uint8_t num_rpt = 0;
-	uint32_t increment;
-
-	increment = 1000; // 1MHz
-
+	
 	if(button == BT_UP)
 	{
 		if(selectionState == state_select_gain)
@@ -232,10 +224,15 @@ uint8_t page_single_tone_bt(struct menuitem *self, uint8_t button, uint8_t rpt)
 void page_single_tone_periodic(struct menuitem *self)
 {
 	static uint8_t toggler;
+	static uint8_t prescaler = 10;
 
-	toggler ^= 1;
-	print_gain(toggler);
-	print_frequency(toggler);
+	if(--prescaler == 0)
+	{
+		prescaler = 10;
+		toggler ^= 1;
+		print_gain(toggler);
+		print_frequency(toggler);
+	}
 }
 
 void page_single_tone_load_parameters(struct menuitem *self)

@@ -71,7 +71,7 @@ void dds_vga_set_gain(uint8_t gain)
 	VGA_PORT = gain;
 }
 
-void dds_set_linear_sweep(uint32_t f_start, uint32_t f_stop, uint32_t step_up, uint32_t step_down)
+void dds_set_linear_sweep(uint32_t f_start, uint32_t f_stop, uint32_t step_up, uint32_t step_down, uint8_t ramp_rate)
 {
 	uint8_t ramp_values[5];
 	uint8_t *temp_f;
@@ -85,7 +85,7 @@ void dds_set_linear_sweep(uint32_t f_start, uint32_t f_stop, uint32_t step_up, u
 	// 400MSPS SYSCLK -> 100MHz SYNC_CLK (10ns) : 2 Sync clock cycles
 	// RISING
 	temp_f = uint32_to_uint8_array(FREQUENCY_FACTOR*step_up);
-	ramp_values[4] = 0xFF;
+	ramp_values[4] = ramp_rate;
 	ramp_values[3] = temp_f[3];
 	ramp_values[2] = temp_f[2];
 	ramp_values[1] = temp_f[1];
@@ -93,7 +93,7 @@ void dds_set_linear_sweep(uint32_t f_start, uint32_t f_stop, uint32_t step_up, u
 	dds_cmd(DDS_REGISTER_PLSCW, 0, ramp_values, DDS_REGISTER_PLSCW_LENGTH);
 	// FALLING
 	temp_f = uint32_to_uint8_array(FREQUENCY_FACTOR*step_down);
-	ramp_values[4] = 0xFF;
+	ramp_values[4] = ramp_rate;
 	ramp_values[3] = temp_f[3];
 	ramp_values[2] = temp_f[2];
 	ramp_values[1] = temp_f[1];
